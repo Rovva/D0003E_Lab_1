@@ -1,8 +1,9 @@
 
 #include <avr/io.h>
+#include <stdbool.h>
 
 
-void LCDinit() {
+void init_lcd() {
 	// LCD Enable (LCDEN) & Low Power Waveform (LCDAB)
 	LCDCRA = (1<<LCDEN) | (1<<LCDAB) | (0<<LCDIF) | (0<<LCDIE) | (0<<LCDBL);
 
@@ -255,16 +256,168 @@ void writeLong(long value) {
  	}
 }
 
+bool is_prime(long i) {
+	int c;
+	// Loop to check if a number is dividable with anything less than half the value of "i"
+	for(c = 2; c <= i/2; c++) {
+		if(i%c == 0) {
+			// Return false as the value of i is not a prime number
+			return false;
+		}
+	}
+
+	if(c == i/2 + 1) {
+		// Return true as "i" is a prime number
+		return true;
+	}
+
+	return false;
+}
+
+void primes(long i) {
+	// infinite loop
+	for(;;) {
+		// Check if the number is a prime number
+		if(is_prime(i) == true) {
+			// If yes, then write to screen
+			writeLong(i);
+		}
+		i++;
+	}
+}
+
+void init_timer() {
+	// Setup prescaler 256, Clock Select (CS12:10)
+	TCCR1B = (1<<CS12) | (0<<CS11) | (0<<CS10);
+	// Enable timer 1
+	TCNT1 = 0;
+}
+
+void blink() {
+	/* 16-bit max value: 65536
+	8 MHz = 8 000 000 Hz
+	256 prescaler
+	8 000 000 / 256 = 31 250
+	65536 / 31250 = 2,097
+	Rounded up means 2,1 seconds per overflow
+
+	One second = 65536 / 2,1 = 31207.62
+
+	0 ON
+	31207 OFF	prev_value <= next_value
+	62414 ON	prev_value <= next_value
+	28085 OFF	prev_value >= next_Value
+	59292 ON	prev_value <= next_value
+	24963 OFF	prev_value >= next_value
+	56170 ON	prev_value <= next_value
+	21841 OFF	prev_value >= next_value
+	53048 ON	prev_value <= next_value
+	18719 OFF	prev_value >= next_value
+	*/
+
+	unsigned int prev_value = TCNT1, next_value = 0, one_second = 31207;
+	next_value = TCNT1 + one_second;
+	//LCDDR3 = LCDDR3 | 0b00000001;
+	for(;;) {
+		prev_value = TCNT1;
+		if((next_value - prev_value) <= 312) {
+			LCDDR3 = LCDDR3 ^ 0b00000001;
+			next_value = TCNT1 + one_second;
+		}
+	}
+}
+
+void init_button() {
+	PORTB = (1<<PB7);
+}
+
+void button() {
+	bool latch = false, buttonNow = false, buttonPrev = false;
+
+	for(;;) {
+		buttonNow = (PINB >> 7);
+		if(buttonNow == false && buttonPrev == true) {
+			if(latch == true) {
+				latch = false;
+			} else {
+				latch = true;
+			}
+		}
+		buttonPrev = buttonNow;
+		if(latch == true) {
+			LCDDR1 = 0b00000010;
+			LCDDR0 = 0b00000000;
+		} else {
+			LCDDR1 = 0b00000000;
+			LCDDR0 = 0b00000100;
+		}
+	}
+}
+
+void primes_part4(long i) {
+	if(is_prime(i) == 1) {
+		writeLong(i);
+	}
+}
+
+void blink_part4(unsigned int *prev_value, unsigned int *next_value, unsigned int *one_second) {
+	if((*next_value - *prev_value) <= 312) {
+		LCDDR3 = LCDDR3 ^ 0b00000001;
+		*next_value = TCNT1 + *one_second;
+	}
+}
+
+void button_part4(bool *latch, bool *buttonPrev) {
+	unsigned int buttonNow = (PINB >> 7);
+	if(buttonNow == false && *buttonPrev == true) {
+		if(*latch == true) {
+			*latch = false;
+		} else {
+			*latch = true;
+		}
+	}
+
+	*buttonPrev = buttonNow;
+	// Need to change code to preserve all other values in the registers
+	if(*latch == true) {
+		LCDDR1 = LCDDR1 | 0b000000010;
+		LCDDR0 = LCDDR0 ^ 0b000000100;
+	} else {
+		LCDDR1 = LCDDR1 ^ 0b000000010;
+		LCDDR0 = LCDDR0 | 0b000000100;
+	}
+}
+
 int main(void)
 {
 	// Setup the clockspeed
 	CLKPR  = 0x80;
 	CLKPR  = 0x00;
 	
-	LCDinit();
-	writeLong(123456);
-    while (1) 
-    {
-    }
+	init_lcd();
+	//writeLong(123456);
+	//if(is_prime(2) == true) {
+	//	writeLong(1);
+	//}
+	//primes(1);
+	//init_timer();
+	//blink();
+	//init_button();
+	//button();
+
+    //while (1)
+    //{
+    //}
+
+	bool buttonPrev = false, latch_button = false;
+	unsigned int prev_value = 0, next_value = 0, one_second = 31207;
+	next_value = TCNT1 + one_second;
+	for(long i = 0;; i++) {
+		prev_value = TCNT1;
+		blink_part4(&prev_value, &next_value, &one_second);
+		button_part4(&buttonPrev, &latch_button);
+		primes_part4(i);
+	}
+
 }
 
