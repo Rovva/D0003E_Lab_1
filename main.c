@@ -23,12 +23,12 @@ unsigned short digitLookUp(uint8_t c) {
 	//unsigned long binary = 0;
 	uint16_t binary = 0;
 	if(c == 48) {
-		// 0 needs A, B, C, D, F, E, K, P
+		// 0 needs A, B, C, D, E, F
 		/*
-			LCDDRx = 1001
+			LCDDRx = 0001
 			LCDDRx+5 = 0101
 			LCDDRx+10 = 0101
-			LCDDRx+15 = 0101
+			LCDDRx+15 = 0001
 		*/
 		binary = 0b0001010101010001;
 	} else if(c == 49) {
@@ -378,7 +378,7 @@ void button() {
 
 // long i
 void primes_part4(uint16_t i) {
-	if(is_prime(i) == 1) {
+	if(is_prime(i) == true) {
 		writeLong(i);
 	}
 }
@@ -445,7 +445,7 @@ int main(void)
 
 	next_value = TCNT1 + one_second;
 
-	for(long i = 0;; i++) {
+	for(uint16_t i = 0;; i++) {
 		prev_value = TCNT1;
 		blink_part4(&prev_value, &next_value, &one_second);
 		button_part4(&buttonPrev, &latch_button);
