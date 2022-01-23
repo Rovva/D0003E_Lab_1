@@ -1,6 +1,7 @@
 
 #include <avr/io.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 
 void init_lcd() {
@@ -18,8 +19,9 @@ void init_lcd() {
 
 }
 
-unsigned short digitLookUp(unsigned char c) {
-	unsigned long binary = 0;
+unsigned short digitLookUp(uint8_t c) {
+	//unsigned long binary = 0;
+	uint16_t binary = 0;
 	if(c == 48) {
 		// 0 needs A, B, C, D, F, E, K, P
 		/*
@@ -116,9 +118,11 @@ unsigned short digitLookUp(unsigned char c) {
 	return binary;
 }
 
-void writeChar(unsigned char letter, unsigned int position) {
-	unsigned long digitBinary;
-	unsigned char nibble_0 = 0, nibble_1 = 0, nibble_2 = 0, nibble_3 = 0, oldValue = 0;
+void writeChar(uint8_t letter, uint8_t position) {
+	//unsigned long digitBinary = 0;
+	uint16_t digitBinary = 0;
+	//unsigned char nibble_0 = 0, nibble_1 = 0, nibble_2 = 0, nibble_3 = 0, oldValue = 0;
+	uint8_t nibble_0 = 0, nibble_1 = 0, nibble_2 = 0, nibble_3 = 0, oldValue = 0;
 	
 	digitBinary = digitLookUp(letter);
 	
@@ -235,13 +239,17 @@ void writeChar(unsigned char letter, unsigned int position) {
 	}
 }
 
-void writeLong(long value) {
-	char array[31];
-	long temp = value;
+void writeLong(uint16_t value) {
+	//char array[31];
+	uint8_t array[31];
+	//long temp = value;
+	uint16_t temp = value;
 	// n is needed to show the digits correctly (reverse)
-	int n = 5;
+	//int n = 5;
+	uint8_t n = 5;
 	// For loop using modulus and division to extract all the digits in the long int
-	for(int i = 0; i < 31; i++) {
+	// int i = 0
+	for(uint8_t i = 0; i < 31; i++) {
 		array[i] = (temp%10) + '0';
 		temp /= 10;
 		// if the temp variable is less than 1, break loop
@@ -250,14 +258,16 @@ void writeLong(long value) {
 		}
 	}
 	// For loop to show the 6 least significant digits
- 	for(int i = 0; i <= 5; i++) {
+	// int i = 0
+ 	for(uint8_t i = 0; i <= 5; i++) {
  		writeChar(array[i], n);
 		n--;
  	}
 }
-
-bool is_prime(long i) {
-	int c;
+// long i
+bool is_prime(uint16_t i) {
+	//int c;
+	uint16_t c;
 	// Loop to check if a number is dividable with anything less than half the value of "i"
 	for(c = 2; c <= i/2; c++) {
 		if(i%c == 0) {
@@ -274,7 +284,8 @@ bool is_prime(long i) {
 	return false;
 }
 
-void primes(long i) {
+// long i
+void primes(uint16_t i) {
 	// infinite loop
 	for(;;) {
 		// Check if the number is a prime number
@@ -315,14 +326,17 @@ void blink() {
 	18719 OFF	prev_value >= next_value
 	*/
 
-	unsigned int prev_value = TCNT1, next_value = 0, one_second = 31207;
-	next_value = TCNT1 + one_second;
+	//unsigned int prev_value = TCNT1, next_value = 0, one_second = 31207;
+	//next_value = prev_value + one_second;
+	uint16_t prev_value = TCNT1, next_value = 0, one_second = 31207;
+	next_value = prev_value + one_second;
+
 	//LCDDR3 = LCDDR3 | 0b00000001;
 	for(;;) {
 		prev_value = TCNT1;
 		if((next_value - prev_value) <= 312) {
 			LCDDR3 = LCDDR3 ^ 0b00000001;
-			next_value = TCNT1 + one_second;
+			next_value = prev_value + one_second;
 		}
 	}
 }
@@ -332,20 +346,28 @@ void init_button() {
 }
 
 void button() {
-	bool latch = false, buttonNow = false, buttonPrev = false;
+	bool latch = false;
+	//unsigned int buttonNow = 0, buttonPrev = 0;
+	uint8_t buttonNow = 0, buttonPrev = 0;
 
 	for(;;) {
+		// Read state of PINB7
 		buttonNow = (PINB >> 7);
-		if(buttonNow == false && buttonPrev == true) {
+		// If the button state is false and the previous state was true then change latch state to true
+		if(buttonNow == 0 && buttonPrev == 1) {
 			if(latch == true) {
 				latch = false;
 			} else {
 				latch = true;
 			}
 		}
+
+		// Store the new value of buttonNow in buttonPrev
 		buttonPrev = buttonNow;
 		if(latch == true) {
+			// Turn on the LCDDR1 bit 1 if latch is true
 			LCDDR1 = 0b00000010;
+			// Turn off the LCDDR0 if latch is true
 			LCDDR0 = 0b00000000;
 		} else {
 			LCDDR1 = 0b00000000;
@@ -354,22 +376,25 @@ void button() {
 	}
 }
 
-void primes_part4(long i) {
+// long i
+void primes_part4(uint16_t i) {
 	if(is_prime(i) == 1) {
 		writeLong(i);
 	}
 }
 
-void blink_part4(unsigned int *prev_value, unsigned int *next_value, unsigned int *one_second) {
-	if((*next_value - *prev_value) <= 312) {
+// unsigned int *prev_value, unsigned int *next_value, unsigned int *one_second
+void blink_part4(uint16_t *prev_value, uint16_t *next_value, uint16_t *one_second) {
+	//
+	if((*next_value - *prev_value) <= 3120) {
 		LCDDR3 = LCDDR3 ^ 0b00000001;
-		*next_value = TCNT1 + *one_second;
+		*next_value = *prev_value + *one_second;
 	}
 }
-
-void button_part4(bool *latch, bool *buttonPrev) {
+// bool *latch, unsigned int *buttonPrev
+void button_part4(uint8_t *buttonPrev, bool *latch) {
 	unsigned int buttonNow = (PINB >> 7);
-	if(buttonNow == false && *buttonPrev == true) {
+	if(buttonNow == 0 && *buttonPrev == 1) {
 		if(*latch == true) {
 			*latch = false;
 		} else {
@@ -378,7 +403,7 @@ void button_part4(bool *latch, bool *buttonPrev) {
 	}
 
 	*buttonPrev = buttonNow;
-	// Need to change code to preserve all other values in the registers
+
 	if(*latch == true) {
 		LCDDR1 = LCDDR1 | 0b000000010;
 		LCDDR0 = LCDDR0 ^ 0b000000100;
@@ -400,18 +425,26 @@ int main(void)
 	//	writeLong(1);
 	//}
 	//primes(1);
-	//init_timer();
+	init_timer();
 	//blink();
-	//init_button();
+	init_button();
 	//button();
 
     //while (1)
     //{
     //}
 
-	bool buttonPrev = false, latch_button = false;
-	unsigned int prev_value = 0, next_value = 0, one_second = 31207;
+	// Part 4
+
+	//unsigned int buttonPrev = 0, latch_button = 0;
+	//unsigned int prev_value = 0, next_value = 0, one_second = 31207;
+
+	bool latch_button = false;
+	uint8_t buttonPrev = 0;
+	uint16_t prev_value = 0, next_value = 0, one_second = 31207;
+
 	next_value = TCNT1 + one_second;
+
 	for(long i = 0;; i++) {
 		prev_value = TCNT1;
 		blink_part4(&prev_value, &next_value, &one_second);
