@@ -315,28 +315,28 @@ void blink() {
 	One second = 65536 / 2,1 = 31207.62
 
 	0 ON
-	31207 OFF	prev_value <= next_value
-	62414 ON	prev_value <= next_value
-	28085 OFF	prev_value >= next_Value
-	59292 ON	prev_value <= next_value
-	24963 OFF	prev_value >= next_value
-	56170 ON	prev_value <= next_value
-	21841 OFF	prev_value >= next_value
-	53048 ON	prev_value <= next_value
-	18719 OFF	prev_value >= next_value
+	31207 OFF	current_value <= next_value
+	62414 ON	current_value <= next_value
+	28085 OFF	current_value >= next_Value
+	59292 ON	current_value <= next_value
+	24963 OFF	current_value >= next_value
+	56170 ON	current_value <= next_value
+	21841 OFF	current_value >= next_value
+	53048 ON	current_value <= next_value
+	18719 OFF	current_value >= next_value
 	*/
 
 	//unsigned int prev_value = TCNT1, next_value = 0, one_second = 31207;
 	//next_value = prev_value + one_second;
-	uint16_t prev_value = TCNT1, next_value = 0, one_second = 31207;
+	uint16_t current_value = TCNT1, next_value = 0, one_second = 31207;
 	next_value = prev_value + one_second;
 
 	//LCDDR3 = LCDDR3 | 0b00000001;
 	for(;;) {
-		prev_value = TCNT1;
-		if((next_value - prev_value) <= 312) {
+		current_value = TCNT1;
+		if((next_value - current_value) <= 312) {
 			LCDDR3 = LCDDR3 ^ 0b00000001;
-			next_value = prev_value + one_second;
+			next_value = current_value + one_second;
 		}
 	}
 }
@@ -351,9 +351,9 @@ void button() {
 	uint8_t buttonNow = 0, buttonPrev = 0;
 
 	for(;;) {
-		// Read state of PINB7
+		// Read value of PINB7
 		buttonNow = (PINB >> 7);
-		// If the button state is false and the previous state was true then change latch state to true
+		// If the button state is 0 and the previous state was 1 then change latch state to true
 		if(buttonNow == 0 && buttonPrev == 1) {
 			if(latch == true) {
 				latch = false;
@@ -384,11 +384,11 @@ void primes_part4(uint16_t i) {
 }
 
 // unsigned int *prev_value, unsigned int *next_value, unsigned int *one_second
-void blink_part4(uint16_t *prev_value, uint16_t *next_value, uint16_t *one_second) {
+void blink_part4(uint16_t *current_value, uint16_t *next_value, uint16_t *one_second) {
 	//
-	if((*next_value - *prev_value) <= 3120) {
+	if((*next_value - *current_value) <= 3120) {
 		LCDDR3 = LCDDR3 ^ 0b00000001;
-		*next_value = *prev_value + *one_second;
+		*next_value = *current_value + *one_second;
 	}
 }
 // bool *latch, unsigned int *buttonPrev
@@ -441,13 +441,13 @@ int main(void)
 
 	bool latch_button = false;
 	uint8_t buttonPrev = 0;
-	uint16_t prev_value = 0, next_value = 0, one_second = 31207;
+	uint16_t current_value = TCNT1, next_value = 0, one_second = 31207;
 
 	next_value = TCNT1 + one_second;
 
-	for(uint16_t i = 0;; i++) {
-		prev_value = TCNT1;
-		blink_part4(&prev_value, &next_value, &one_second);
+	for(uint16_t i = 26000;; i++) {
+		current_value = TCNT1;
+		blink_part4(&current_value, &next_value, &one_second);
 		button_part4(&buttonPrev, &latch_button);
 		primes_part4(i);
 	}
