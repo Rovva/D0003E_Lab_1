@@ -139,30 +139,30 @@ void writeChar(char ch, int pos) {
 
 	// Create a pointer and assign the memory address of LCDDR0
 	// (is volatile really needed?)
-	volatile uint8_t *pointer = &LCDDR0;
+	volatile uint8_t *LCDDRAddress = &LCDDR0;
 	// Increment the pointers memory address with the value calculated earlier
 	// This is needed to be able to use LCDDR0, LCDDR1, LCDDR2 etc.
-	pointer = (pointer + increment);
+	LCDDRAddress = (LCDDRAddress + increment);
 	// Preserve the old value by using a mask
-	oldValue = mask & *pointer;
+	oldValue = mask & *LCDDRAddress;
 	// Add the nibble using OR
-	*pointer = oldValue | nibble_0;
+	*LCDDRAddress = oldValue | nibble_0;
 	// Increase the memory address of the pointer with 5 to be able to
 	// use LCDDRx+5
-	pointer = pointer + 5;
+	LCDDRAddress = LCDDRAddress + 5;
 
-	oldValue = mask & *pointer;
-	*pointer = oldValue | nibble_1;
+	oldValue = mask & *LCDDRAddress;
+	*LCDDRAddress = oldValue | nibble_1;
 	// Increase with 5 to be able to use LCDDRx+10
-	pointer = pointer + 5;
+	LCDDRAddress = LCDDRAddress + 5;
 
-	oldValue = mask & *pointer;
-	*pointer = oldValue | nibble_2;
+	oldValue = mask & *LCDDRAddress;
+	*LCDDRAddress = oldValue | nibble_2;
 	// Increase with 5 to be able to use LCDDRx+15
-	pointer = pointer + 5;
+	LCDDRAddress = LCDDRAddress + 5;
 
-	oldValue = mask & *pointer;
-	*pointer = oldValue | nibble_3;
+	oldValue = mask & *LCDDRAddress;
+	*LCDDRAddress = oldValue | nibble_3;
 
 }
 
