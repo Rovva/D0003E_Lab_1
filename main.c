@@ -251,7 +251,7 @@ void blink() {
 
 	for(;;) {
 		current_value = TCNT1;
-		if((next_value - current_value) <= 312) {
+		if((current_value - next_value) <= 312) {
 			LCDDR3 = LCDDR3 ^ 0b00000001;
 			next_value = current_value + one_second;
 		}
@@ -300,7 +300,7 @@ void primes_part4(uint16_t i) {
 
 void blink_part4(uint16_t *current_value, uint16_t *next_value, uint16_t *one_second) {
 	//
-	if((*next_value - *current_value) <= 3120) {
+	if((*current_value - *next_value) <= 3120) {
 		LCDDR3 = LCDDR3 ^ 0b00000001;
 		*next_value = *current_value + *one_second;
 	}
@@ -338,9 +338,9 @@ int main(void)
 	//if(is_prime(2) == true) {
 	//	writeLong(1);
 	//}
-	primes(1);
+	//primes(1);
 	init_timer();
-	//blink();
+	blink();
 	init_button();
 	//button();
 
