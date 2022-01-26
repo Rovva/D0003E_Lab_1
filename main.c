@@ -20,6 +20,11 @@ void init_lcd() {
 }
 
 uint16_t digitLookUp(uint8_t c) {
+
+	if(c < 48 || c > 57) {
+		return 0;
+	}
+
 	uint16_t binary[10];
 
 	binary[0] = 0b0001010101010001; // 0
