@@ -1,0 +1,141 @@
+digitLookUp:
+	if(c == 48) {
+		binary = 0b0001010101010001;
+	} else if(c == 49) {
+		binary = 0b0000000100010000;
+	} else if(c == 50) {
+		binary = 0b0001000111100001;
+	} else if(c == 51) {
+		binary = 0b0001000110110001;
+	} else if(c == 52) {
+		binary = 0b0000010110110000;
+	} else if(c == 53) {
+		binary = 0b0001010010110001;
+	} else if(c == 54) {
+		binary = 0b0001010011110001;
+	} else if(c == 55) {
+		binary = 0b0001000100010000;
+	} else if(c == 56) {
+		binary = 0b0001010111110001;
+	} else if(c == 57) {
+		binary = 0b0001010110110000;
+	} else {
+		binary = 0b0000000000000000;
+	}
+	return binary;
+
+
+writeChar:
+	/*
+	if(position == 0) {
+		// Extract nibble from the binary output of binLookup
+		//               0001 0101 1011 0000
+		//           0000 1111
+		nibble_0 = 0b00001111 & (digitBinary >> 12);
+		//          0001 0101 1011 0000
+		//           0000 1111
+		nibble_1 = 0b00001111 & (digitBinary >> 8);
+		//     0001 0101 1011 0000
+		//           0000 1111
+		nibble_2 = 0b00001111 & (digitBinary >> 4);
+		//0001 0101 1011 0000
+		//           0000 1111
+		nibble_3 = 0b00001111 & digitBinary;
+				
+		// Store the old nibble value for position 1 from the register
+		oldValue = 0b11110000 & LCDDR0;
+		// Combine the old nibble value for position 1 with nibble value of position 0
+		// and set LCDDR0 registers with the new value
+		LCDDR0 = oldValue | nibble_0;
+		oldValue = 0b11110000 & LCDDR5;
+		LCDDR5 = oldValue | nibble_1;
+		oldValue = 0b11110000 & LCDDR10;
+		LCDDR10 = oldValue | nibble_2;
+		oldValue = 0b11110000 & LCDDR15;
+		LCDDR15 = oldValue | nibble_3;
+	} else if(position == 1) {
+		// Because of different position we need to bitshift differently
+		//               0001 0101 1011 0000
+		//               1111 0000
+		nibble_0 = 0b11110000 & (digitBinary >> 8);
+		//          0001 0101 1011 0000
+		//               1111 0000
+		nibble_1 = 0b11110000 & (digitBinary >> 4);
+		//     0001 0101 1011 0000
+		//               1111 0000
+		nibble_2 = 0b11110000 & digitBinary;
+		//0001 0101 1011 0000
+		//               1111 0000
+		nibble_3 = 0b11110000 & (digitBinary << 4);
+		
+		oldValue = 0b00001111 & LCDDR0;
+		LCDDR0 = oldValue | nibble_0;
+
+		oldValue = 0b00001111 & LCDDR5;
+		LCDDR5 = oldValue | nibble_1;
+
+		oldValue = 0b00001111 | LCDDR10;
+		LCDDR10 = oldValue | nibble_2;
+
+		oldValue = 0b00001111 | LCDDR15;
+		LCDDR15 = oldValue | nibble_3;
+	} else if(position == 2) {
+		nibble_0 = 0b00001111 & (digitBinary >> 12);
+		nibble_1 = 0b00001111 & (digitBinary >> 8);
+		nibble_2 = 0b00001111 & (digitBinary >> 4);
+		nibble_3 = 0b00001111 & digitBinary;
+
+		oldValue = 0b11110000 & LCDDR1;
+		LCDDR1 = oldValue | nibble_0;
+		oldValue = 0b11110000 & LCDDR6;
+		LCDDR6 = oldValue | nibble_1;
+		oldValue = 0b11110000 & LCDDR11;
+		LCDDR11 = oldValue | nibble_2;
+		oldValue = 0b11110000 & LCDDR16;
+		LCDDR16 = oldValue | nibble_3;
+	} else if(position == 3) {
+		nibble_0 = 0b11110000 & (digitBinary >> 8);
+		nibble_1 = 0b11110000 & (digitBinary >> 4);
+		nibble_2 = 0b11110000 & digitBinary;
+		nibble_3 = 0b11110000 & (digitBinary << 4);
+
+		oldValue = 0b00001111 & LCDDR1;
+		LCDDR1 = oldValue | nibble_0;
+		oldValue = 0b00001111 & LCDDR6;
+		LCDDR6 = oldValue | nibble_1;
+		oldValue = 0b00001111 & LCDDR11;
+		LCDDR11 = oldValue | nibble_2;
+		oldValue = 0b00001111 & LCDDR16;
+		LCDDR16 = oldValue | nibble_3;
+	} else if(position == 4) {
+		nibble_0 = 0b00001111 & (digitBinary >> 12);
+		nibble_1 = 0b00001111 & (digitBinary >> 8);
+		nibble_2 = 0b00001111 & (digitBinary >> 4);
+		nibble_3 = 0b00001111 & digitBinary;
+
+		oldValue = 0b11110000 & LCDDR2;
+		LCDDR2 = oldValue | nibble_0;
+		oldValue = 0b11110000 & LCDDR7;
+		LCDDR7 = oldValue | nibble_1;
+		oldValue = 0b11110000 & LCDDR12;
+		LCDDR12 = oldValue | nibble_2;
+		oldValue = 0b11110000 & LCDDR17;
+		LCDDR17 = oldValue | nibble_3;
+	} else if(position == 5) {
+		nibble_0 = 0b11110000 & (digitBinary >> 8);
+		nibble_1 = 0b11110000 & (digitBinary >> 4);
+		nibble_2 = 0b11110000 & digitBinary;
+		nibble_3 = 0b11110000 & (digitBinary << 4);
+
+		oldValue = 0b00001111 & LCDDR2;
+		LCDDR2 = oldValue | nibble_0;
+		oldValue = 0b00001111 & LCDDR7;
+		LCDDR7 = oldValue | nibble_1;
+		oldValue = 0b00001111 & LCDDR12;
+		LCDDR12 = oldValue | nibble_2;
+		oldValue = 0b00001111 & LCDDR17;
+		LCDDR17 = oldValue | nibble_3;
+	} else {
+		return;
+	}
+	*/
