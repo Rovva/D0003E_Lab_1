@@ -107,18 +107,10 @@ void writeChar(char ch, int pos) {
 	// Fetch the value needed to display number "ch" in LCDDRx
 	digitBinary = digitLookUp(ch);
 
-	// Because there are 6 positions on 3 LCDDRx registers
-	// we need to adjust "increment" so we do not get wrong
-	// memory addresses
-	if(pos >= 0 && pos <= 1) {
-		increment = 0;
-	} else if(pos >= 2 && pos <= 3) {
-		increment = 1;
-	} else {
-		increment = 2;
-	}
+	// Bitshift 1 bit to get valid values for incrementing the pointer
+	increment = pos >> 1;
 
-	// Depending on if the pos is even or odd we adjust the nibbles
+	// Depending on if the value of pos is even or odd we adjust the nibbles
 	// and mask correctly
 	if((pos % 2) == 0) {
 		nibble_0 = 0b00001111 & (digitBinary >> 12);
@@ -141,7 +133,7 @@ void writeChar(char ch, int pos) {
 	// (is volatile really needed?)
 	volatile uint8_t *LCDDRAddress = &LCDDR0;
 	// Increment the pointers memory address with the value calculated earlier
-	// This is needed to be able to use LCDDR0, LCDDR1, LCDDR2 etc.
+	// This is needed to be able to use LCDDR0+x, LCDDR1+x, LCDDR2+x etc.
 	LCDDRAddress = (LCDDRAddress + increment);
 	// Preserve the old value by using a mask
 	oldValue = mask & *LCDDRAddress;
@@ -166,7 +158,7 @@ void writeChar(char ch, int pos) {
 
 }
 
-void writeLong(uint32_t value) {
+void writeLong(long value) {
 	char array[31];
 	uint32_t temp = value;
 	// n is needed to show the digits correctly (reverse)
@@ -333,22 +325,25 @@ int main(void)
 	CLKPR  = 0x80;
 	CLKPR  = 0x00;
 	
+	// Part 1
 	init_lcd();
 	//writeLong(123456);
-	//if(is_prime(2) == true) {
-	//	writeLong(1);
-	//}
+
 	//primes(1);
+
+	// Part 2
 	init_timer();
-	blink();
+	//blink();
+
+	// Part 3
 	init_button();
 	//button();
 
 
-    while (1) {}
+    //while (1) {}
 
 	// Part 4
-	/*
+
 	//unsigned int buttonPrev = 0, latch_button = 0;
 	//unsigned int prev_value = 0, next_value = 0, one_second = 31207;
 
@@ -358,12 +353,12 @@ int main(void)
 
 	next_value = TCNT1 + one_second;
 
-	for(uint32_t i = 26000;; i++) {
+	for(uint32_t i = 0;; i++) {
 		current_value = TCNT1;
 		blink_part4(&current_value, &next_value, &one_second);
 		button_part4(&buttonPrev, &latch_button);
 		primes_part4(i);
 	}
-	*/
+
 }
 

@@ -24,6 +24,21 @@ digitLookUp:
 	}
 	return binary;
 
+writeChar:
+
+	/*
+	// Because there are 6 positions on 3 LCDDRx registers
+	// we need to adjust "increment" so we do not get wrong
+	// memory addresses
+	if(pos >= 0 && pos <= 1) {
+		increment = 0;
+	} else if(pos >= 2 && pos <= 3) {
+		increment = 1;
+	} else {
+		increment = 2;
+	}
+	*/
+
 
 writeChar:
 	/*
