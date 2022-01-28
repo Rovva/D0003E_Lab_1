@@ -243,7 +243,7 @@ void blink() {
 
 	for(;;) {
 		current_value = TCNT1;
-		if((current_value - next_value) <= 312) {
+		if((current_value - next_value) <= 0) {
 			LCDDR3 = LCDDR3 ^ 0b00000001;
 			next_value = current_value + one_second;
 		}
@@ -292,7 +292,7 @@ void primes_part4(uint16_t i) {
 
 void blink_part4(uint16_t *current_value, uint16_t *next_value, uint16_t *one_second) {
 	//
-	if((*current_value - *next_value) <= 3120) {
+	if((*current_value - *next_value) <= 0) {
 		LCDDR3 = LCDDR3 ^ 0b00000001;
 		*next_value = *current_value + *one_second;
 	}
@@ -346,19 +346,19 @@ int main(void)
 
 	//unsigned int buttonPrev = 0, latch_button = 0;
 	//unsigned int prev_value = 0, next_value = 0, one_second = 31207;
-
+	
 	bool latch_button = false;
 	uint8_t buttonPrev = 0;
 	uint16_t current_value = TCNT1, next_value = 0, one_second = 31207;
 
 	next_value = TCNT1 + one_second;
 
-	for(uint32_t i = 0;; i++) {
+	for(uint32_t i = 25000;; i++) {
 		current_value = TCNT1;
 		blink_part4(&current_value, &next_value, &one_second);
 		button_part4(&buttonPrev, &latch_button);
 		primes_part4(i);
 	}
-
+	
 }
 
